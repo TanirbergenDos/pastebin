@@ -1,13 +1,8 @@
-from string import ascii_lowercase
-from random import choice
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
+
 from .models import Paste
-
-RESULT = ascii_lowercase + "0123456789"
-def random_url():
-    return ''.join(choice(RESULT) for _ in range(8))
-
+from .utils import random_url
 
 
 def create_paste(request):
@@ -16,6 +11,7 @@ def create_paste(request):
         Paste.objects.create(text=request.POST["text"], url=url)
         return HttpResponseRedirect(reverse("pastes:show", args=(url,)))
     return render(request, "pastes/create_paste.html")
+
 
 def show_paste(request, pk):
     context = {
