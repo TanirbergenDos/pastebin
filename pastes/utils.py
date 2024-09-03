@@ -11,7 +11,7 @@ def random_url(length=8):
 
 def is_less_than_1mb(text):
     """Return True if text is less than 1 MB (1_000_000 bytes)"""
-    if len(text.encode('utf-8')) >= 1_000_000:
+    if len(text.encode("utf-8")) >= 1_000_000:
         return False
     return True
 
