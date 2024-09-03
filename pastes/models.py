@@ -1,10 +1,12 @@
 from django.db import models
-from django.utils import timezone
+from django.urls import reverse
+from django.utils.timezone import now
+
 
 
 class NotExpiredManager(models.Manager):
     def get_queryset(self) -> models.QuerySet:
-        return super().get_queryset().filter(expired_at__gte=timezone.now())
+        return super().get_queryset().filter(expired_at__gte=now())
 
 
 class Paste(models.Model):
@@ -20,3 +22,9 @@ class Paste(models.Model):
         if len(self.text) > 50:
             return f"{self.text[:50]}..."
         return self.text
+    
+    def get_absolute_url(self):
+        return reverse("pastes:show", kwargs={"pk": self.url})
+    
+
+   
