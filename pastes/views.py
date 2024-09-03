@@ -1,31 +1,34 @@
 from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.utils.timezone import timedelta, now
 
 from .models import Paste
 from .forms import AddPasteForm
 from .utils import random_url, is_less_than_1mb
 
-
 URL_LENGTH = 6
+EXPIRATION_DATE = timedelta(days=1)
 
 
 def create_paste(request):
     if request.method == "POST":
-        url = random_url(URL_LENGTH)
         data = request.POST.copy()
+        
         if is_less_than_1mb(data.get("text")):
             if not data.get("url").strip():
-                data.update({"url": url})
+                data.update({"url": random_url(URL_LENGTH)})
+
+            if not data.get("expired_at"):
+                data.update({"expired_at": now() + EXPIRATION_DATE})
 
             form = AddPasteForm(data=data)
             if form.is_valid():
-                form.save()
+                paste = form.save()
+                return redirect(paste.get_absolute_url())
 
-                return redirect(reverse("pastes:show", args=(data["url"],)))
+        else:
+            form = AddPasteForm(data=data)
 
-        form = AddPasteForm(data=request.POST)
     else:
-
         form = AddPasteForm()
     context = {"form": form}
     return render(request, "pastes/create_paste.html", context)
